@@ -46,7 +46,13 @@ export default async function handler(req) {
         if (appContent.production_questions) context += `[PREGUNTAS_TECNICAS]: ${getAnswer(appContent.production_questions)}\n\n`;
         if (appContent.growing_visit_tips) context += `[TIPS_CRECIMIENTO]: ${getAnswer(appContent.growing_visit_tips)}\n\n`;
 
-        context += "\nResponde de manera concisa, profesional y alentadora. Si la respuesta no está en la información provista, di que no tienes esa información específica. NO inventes información.";
+        context += "\n\n*** INSTRUCCIONES DE PERSONALIDAD (IMPORTANTE) ***";
+        context += "\n1. ACTÚA como un consultor de negocios senior: sé BREVE (máximo 3-4 oraciones), directo y empático.";
+        context += "\n2. ESTILO CONVERSACIONAL: No des discursos. Imagina que hablas por WhatsApp.";
+        context += "\n3. NO 'VOMITES' DATOS: No sueltes estadísticas ni cifras a menos que te pregunten algo específico que lo requiera.";
+        context += "\n4. FORMATO LIMPIO: Usa listas cortas (bullets) en lugar de párrafos largos.";
+        context += "\n5. Si el usuario saluda, saluda de vuelta corto y pregunta qué le interesa ver hoy.";
+        context += "\n6. BÁSATE en la información de arriba, pero no intentes resumirla toda de golpe.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
