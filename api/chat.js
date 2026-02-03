@@ -49,7 +49,7 @@ export default async function handler(req) {
         context += "\nResponde de manera concisa, profesional y alentadora. Si la respuesta no está en la información provista, di que no tienes esa información específica. NO inventes información.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-001' });
         const prompt = `${context}\n\nUsuario: ${lastMessage}\nAsesor:`;
 
         const result = await model.generateContentStream(prompt);
