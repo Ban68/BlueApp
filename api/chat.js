@@ -1,9 +1,5 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { streamText } from 'ai';
-import { google } from '@ai-sdk/google'; // Actually we might need @ai-sdk/google if using 'ai' sdk specifically, but let's stick to standard Vercel serverless pattern first with raw SDK if that fails, but Vercel AI SDK is best.
-// Wait, 'ai' sdk usually works with specific providers. 
-// Let's keep it simple: Standard Node.js handler using @google/generative-ai directly for maximum control over context injecting.
 
 export const config = {
     runtime: 'edge',

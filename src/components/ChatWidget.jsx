@@ -1,7 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
-import { useChat } from 'ai/react'; // Vercel AI SDK React hook
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
