@@ -1,8 +1,7 @@
-
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const config = {
-    runtime: 'edge',
+    maxDuration: 60, // Allow longer timeouts for AI generation
 };
 
 // Load content relative to the function (Vercel builds flatten things, but let's try to pass it from frontend or hardcode/import it)
@@ -29,11 +28,17 @@ const buildContext = () => {
 export default async function handler(req) {
     if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        console.error("GEMINI_API_KEY is missing");
+        return new Response(JSON.stringify({ error: "Configuration Error: GEMINI_API_KEY is missing in Vercel." }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
+
     try {
         const { messages } = await req.json();
         const lastMessage = messages[messages.length - 1].content;
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         const prompt = `${buildContext()}\n\nUsuario: ${lastMessage}\nAsesor:`;
@@ -43,11 +48,16 @@ export default async function handler(req) {
         // Convert Gemini stream to text stream response
         const stream = new ReadableStream({
             async start(controller) {
-                for await (const chunk of result.stream) {
-                    const chunkText = chunk.text();
-                    controller.enqueue(new TextEncoder().encode(chunkText));
+                try {
+                    for await (const chunk of result.stream) {
+                        const chunkText = chunk.text();
+                        controller.enqueue(new TextEncoder().encode(chunkText));
+                    }
+                    controller.close();
+                } catch (streamError) {
+                    console.error("Stream Error:", streamError);
+                    controller.error(streamError);
                 }
-                controller.close();
             },
         });
 
@@ -56,7 +66,7 @@ export default async function handler(req) {
         });
 
     } catch (error) {
-        console.error(error);
-        return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+        console.error("Generator Error:", error);
+        return new Response(JSON.stringify({ error: error.message || "Unknown AI Error" }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 }

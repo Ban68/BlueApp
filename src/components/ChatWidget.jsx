@@ -40,7 +40,10 @@ const ChatWidget = () => {
                 body: JSON.stringify({ messages: [...messages, userMessage] })
             });
 
-            if (!response.ok) throw new Error('Error en la respuesta');
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `Error ${response.status}: ${response.statusText}`);
+            }
 
             // Handle Stream
             const reader = response.body.getReader();
@@ -65,7 +68,7 @@ const ChatWidget = () => {
 
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Lo siento, tuve problemas para conectar con el servidor. Por favor intenta más tarde.' }]);
+            setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${error.message}. Por favor verifica la configuración.` }]);
         } finally {
             setIsLoading(false);
         }
