@@ -399,6 +399,21 @@ const ChatWidget = () => {
                 .send-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
                 .animate-fade-in-up { animation: fade-in-up 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
                 @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); scale: 0.95; } to { opacity: 1; transform: translateY(0); scale: 1; } }
+                
+                @media (max-width: 480px) {
+                    .chat-window {
+                        width: 100%; height: 100%;
+                        bottom: 0; right: 0;
+                        border-radius: 0;
+                        border: none;
+                    }
+                    .chat-widget-container {
+                        bottom: 0; right: 0; z-index: 9999;
+                    }
+                    .chat-toggle {
+                        position: fixed; bottom: 1.5rem; right: 1.5rem;
+                    }
+                }
             `}</style>
         </div>
     );

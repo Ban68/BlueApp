@@ -427,6 +427,13 @@ const FarmVisit = () => {
                     .card { box-shadow: none; border: none; padding: 0; }
                     body { background: white; }
                 }
+
+                @media (max-width: 640px) {
+                    .grid-2, .form-grid { grid-template-columns: 1fr; }
+                    .start-card { padding: 1.25rem; margin: 1rem 0; width: 100%; }
+                    .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+                    .icon-badge { display: none; }
+                }
             `}</style>
         </div>
     );
