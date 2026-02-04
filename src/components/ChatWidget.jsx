@@ -407,15 +407,18 @@ const ChatWidget = () => {
                         width: 100% !important; height: 100% !important;
                         bottom: 0 !important; right: 0 !important;
                         z-index: 9999;
+                        pointer-events: none; /* Allow clicks to pass through */
                     }
                     .chat-window {
                         width: 100%; height: 100%;
                         border-radius: 0;
                         border: none;
                         display: flex; flex-direction: column;
+                        pointer-events: auto; /* Re-enable clicks for the chat window */
                     }
                     .chat-toggle {
                         position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 10000;
+                        pointer-events: auto; /* Re-enable clicks for the button */
                     }
                     /* Ensure headers don't get covered by browser bars if needed, but flex usually handles it */
                 }
