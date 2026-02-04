@@ -1,6 +1,69 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Paperclip, Image as ImageIcon, Trash2 } from 'lucide-react';
 
+// === Markdown Parser Helpers ===
+const parseBold = (text) => {
+    // Simple regex to replace **text** with <strong>text</strong>
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+};
+
+const FormatMessage = ({ content }) => {
+    if (!content) return null;
+
+    // 1. Split into lines to identify bullets
+    const lines = content.split('\n');
+    const elements = [];
+    let listItems = [];
+    let inList = false;
+
+    lines.forEach((line, lineIdx) => {
+        const trimmed = line.trim();
+        // Check for bullets (* or - at start)
+        // Adjust regex to be flexible with space
+        const isBullet = /^[\*-]\s/.test(trimmed);
+
+        if (isBullet) {
+            inList = true;
+            // Clean the bullet marker
+            const cleanText = trimmed.replace(/^[\*-]\s/, '');
+            listItems.push(cleanText);
+        } else {
+            // If we were in a list, close it now
+            if (inList) {
+                elements.push(
+                    <ul key={`list-${lineIdx}`} className="formatted-list">
+                        {listItems.map((item, i) => (
+                            <li key={i} dangerouslySetInnerHTML={{ __html: parseBold(item) }} />
+                        ))}
+                    </ul>
+                );
+                inList = false;
+                listItems = [];
+            }
+
+            // Render normal paragraph if not empty
+            if (trimmed) {
+                elements.push(
+                    <p key={`p-${lineIdx}`} className="formatted-p" dangerouslySetInnerHTML={{ __html: parseBold(line) }} />
+                );
+            }
+        }
+    });
+
+    // Flush lingering list
+    if (inList) {
+        elements.push(
+            <ul key={`list-end`} className="formatted-list">
+                {listItems.map((item, i) => (
+                    <li key={i} dangerouslySetInnerHTML={{ __html: parseBold(item) }} />
+                ))}
+            </ul>
+        );
+    }
+
+    return <div className="formatted-content">{elements}</div>;
+};
+
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
@@ -57,7 +120,6 @@ const ChatWidget = () => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
-                // Remove data url prefix (e.g. "data:image/jpeg;base64,")
                 const base64String = reader.result.split(',')[1];
                 resolve(base64String);
             };
@@ -72,7 +134,7 @@ const ChatWidget = () => {
         const userMessage = {
             role: 'user',
             content: input,
-            image: imagePreview // Store preview for UI display 
+            image: imagePreview
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -92,7 +154,6 @@ const ChatWidget = () => {
                 const base64Image = await convertToBase64(currentImage);
                 body.image = base64Image;
                 body.mimeType = currentMimeType;
-                // Add explicit text if empty so connection doesn't fail
                 body.messages[body.messages.length - 1].content = currentInput || "[Análisis de imagen solicitado]";
             }
 
@@ -107,7 +168,6 @@ const ChatWidget = () => {
                 throw new Error(errData.error || `Error ${response.status}: ${response.statusText}`);
             }
 
-            // Handle Stream
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let assistantMessage = { role: 'assistant', content: '' };
@@ -120,7 +180,6 @@ const ChatWidget = () => {
                 const text = decoder.decode(value, { stream: true });
                 assistantMessage.content += text;
 
-                // Update last message with new content
                 setMessages(prev => {
                     const newMsgs = [...prev];
                     newMsgs[newMsgs.length - 1] = { ...assistantMessage };
@@ -138,7 +197,6 @@ const ChatWidget = () => {
 
     return (
         <div className="chat-widget-container">
-            {/* Toggle Button */}
             <button
                 className={`chat-toggle ${isOpen ? 'hidden' : ''}`}
                 onClick={() => setIsOpen(true)}
@@ -148,7 +206,6 @@ const ChatWidget = () => {
                 </div>
             </button>
 
-            {/* Chat Window */}
             {isOpen && (
                 <div className="chat-window animate-fade-in-up">
                     <div className="chat-header">
@@ -165,12 +222,13 @@ const ChatWidget = () => {
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`message ${msg.role}`}>
                                 {msg.role === 'assistant' && <div className="avatar bot"><Bot size={14} /></div>}
-                                <div className="bubble-container" style={{ maxWidth: '80%' }}>
+                                <div className="bubble-container" style={{ maxWidth: '85%' }}>
                                     {msg.image && (
                                         <img src={msg.image} alt="Upload" className="message-image" />
                                     )}
                                     {msg.content && <div className={`bubble ${msg.role === 'user' ? 'user-bubble' : 'bot-bubble'}`}>
-                                        {msg.content}
+                                        {/* Use the Markdown Formatter */}
+                                        <FormatMessage content={msg.content} />
                                     </div>}
                                 </div>
                                 {msg.role === 'user' && <div className="avatar user"><User size={14} /></div>}
@@ -179,13 +237,12 @@ const ChatWidget = () => {
                         {isLoading && (
                             <div className="message assistant">
                                 <div className="avatar bot"><Bot size={14} /></div>
-                                <div className="bubble bot-bubble typing">Analizando...</div>
+                                <div className="bubble bot-bubble typing">Escribiendo...</div>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Image Preview Area */}
                     {imagePreview && (
                         <div className="image-preview-area">
                             <div className="preview-container">
@@ -218,7 +275,7 @@ const ChatWidget = () => {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={selectedImage ? "Describe la foto..." : "Pregunta sobre variedades..."}
+                            placeholder={selectedImage ? "Describe la foto..." : "Escribe tu consulta..."}
                             className="text-input"
                         />
                         <button type="submit" disabled={isLoading || (!input.trim() && !selectedImage)} className="send-btn">
@@ -244,7 +301,6 @@ const ChatWidget = () => {
                     border-radius: 50%; display: flex; align-items: center; justify-content: center;
                     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
                 }
-                
                 .chat-window {
                     width: 380px; height: 600px;
                     background: white; border-radius: 1rem;
@@ -252,33 +308,27 @@ const ChatWidget = () => {
                     display: flex; flex-direction: column;
                     overflow: hidden; border: 1px solid var(--border);
                 }
-                
                 .chat-header {
                     background: var(--primary); color: white;
                     padding: 1rem; display: flex; justify-content: space-between; align-items: center;
                 }
                 .close-btn { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; }
                 .close-btn:hover { opacity: 1; }
-
                 .chat-messages {
                     flex: 1; padding: 1rem; overflow-y: auto; background: #f8fafc;
                     display: flex; flex-direction: column; gap: 1rem;
                 }
-
                 .message { display: flex; gap: 0.5rem; align-items: flex-end; }
                 .message.user { justify-content: flex-end; }
-                
                 .avatar {
                     width: 28px; height: 28px; border-radius: 50%;
-                    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-                    font-size: 12px;
+                    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px;
                 }
                 .avatar.bot { background: var(--primary); color: white; }
                 .avatar.user { background: var(--secondary); color: #1e293b; }
-
                 .bubble-container { display: flex; flex-direction: column; gap: 0.25rem; }
                 .message.user .bubble-container { align-items: flex-end; }
-
+                
                 .bubble {
                     padding: 0.75rem 1rem; border-radius: 1rem; font-size: 0.95rem; line-height: 1.5;
                     word-wrap: break-word; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -291,19 +341,28 @@ const ChatWidget = () => {
                     background: var(--primary); color: white;
                     border-bottom-right-radius: 4px;
                 }
-                .bubble.typing { color: #64748b; letter-spacing: 2px; font-size: 0.8rem; background: transparent; border: none; box-shadow: none; padding-left: 0;}
+                .bubble.typing { color: #64748b; letter-spacing: 2px; font-size: 0.8rem; background: transparent; border: none; box-shadow: none; padding-left: 0; }
                 
+                /* Markdown / Formatter Styles */
+                .formatted-content {
+                    display: flex; flex-direction: column; gap: 0.5rem;
+                }
+                .formatted-p { margin: 0; }
+                .formatted-list {
+                    margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.25rem;
+                }
+                .formatted-list li { margin: 0; }
+                strong { font-weight: 600; color: inherit; }
+
+                /* Rest of UI */
                 .message-image {
                     max-width: 100%; border-radius: 0.75rem; border: 1px solid #e2e8f0;
                     margin-bottom: 0.25rem; display: block;
                 }
-
                 .image-preview-area {
                     padding: 0.75rem 1rem; background: #f8fafc; border-top: 1px solid #e2e8f0;
                 }
-                .preview-container {
-                    position: relative; display: inline-block;
-                }
+                .preview-container { margin-bottom: 0; }
                 .preview-container img {
                     height: 80px; border-radius: 0.75rem; border: 1px solid #cbd5e1; object-fit: cover;
                 }
@@ -313,7 +372,6 @@ const ChatWidget = () => {
                     width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
                     border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
-
                 .chat-input-area {
                     padding: 1rem; border-top: 1px solid #e2e8f0; background: white;
                     display: flex; gap: 0.75rem; align-items: center;
@@ -323,14 +381,12 @@ const ChatWidget = () => {
                     outline: none; font-size: 0.95rem; transition: border-color 0.2s;
                 }
                 .text-input:focus { border-color: var(--primary); ring: 2px solid var(--primary-light); }
-                
                 .attach-btn {
                     background: #f1f5f9; border: none; color: #64748b; cursor: pointer;
                     padding: 0.6rem; border-radius: 50%; transition: all 0.2s;
                     display: flex; align-items: center; justify-content: center;
                 }
                 .attach-btn:hover { background: #e2e8f0; color: var(--primary); }
-                
                 .send-btn {
                     background: var(--primary); color: white; border: none;
                     width: 42px; height: 42px; border-radius: 50%;
@@ -341,12 +397,8 @@ const ChatWidget = () => {
                 .send-btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
                 .send-btn:active { transform: translateY(1px); }
                 .send-btn:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
-
-                @keyframes fade-in-up {
-                    from { opacity: 0; transform: translateY(20px); scale: 0.95; }
-                    to { opacity: 1; transform: translateY(0); scale: 1; }
-                }
                 .animate-fade-in-up { animation: fade-in-up 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+                @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); scale: 0.95; } to { opacity: 1; transform: translateY(0); scale: 1; } }
             `}</style>
         </div>
     );
