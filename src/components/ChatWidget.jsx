@@ -404,23 +404,31 @@ const ChatWidget = () => {
 
                 @media (max-width: 480px) {
                     .chat-widget-container {
-                        width: 100% !important; height: 100% !important;
-                        bottom: 0 !important; right: 0 !important;
+                        position: fixed !important;
+                        top: 0 !important;
+                        bottom: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        width: 100% !important; 
+                        height: 100% !important; /* Fallback */
+                        height: 100dvh !important; /* Modern mobile fix */
                         z-index: 9999;
-                        pointer-events: none; /* Allow clicks to pass through */
+                        pointer-events: none;
                     }
                     .chat-window {
                         width: 100%; height: 100%;
                         border-radius: 0;
                         border: none;
                         display: flex; flex-direction: column;
-                        pointer-events: auto; /* Re-enable clicks for the chat window */
+                        pointer-events: auto;
+                    }
+                    .text-input {
+                        font-size: 16px !important; /* Prevent iOS zoom */
                     }
                     .chat-toggle {
                         position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 10000;
-                        pointer-events: auto; /* Re-enable clicks for the button */
+                        pointer-events: auto;
                     }
-                    /* Ensure headers don't get covered by browser bars if needed, but flex usually handles it */
                 }
             `}</style>
         </div>
