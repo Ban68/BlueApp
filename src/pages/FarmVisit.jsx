@@ -179,7 +179,7 @@ const FarmVisit = () => {
                             </select>
                         </div>
                     </div>
-                    <button onClick={startVisit} className="btn btn-primary w-full py-3 flex-center">
+                    <button onClick={startVisit} className="btn btn-primary w-full py-3 flex-center mt-6">
                         Comenzar Recorrido <ArrowRight size={20} />
                     </button>
                 </div>
@@ -403,6 +403,14 @@ const FarmVisit = () => {
                 .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; color: #475569; }
                 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+                
+                /* Spacing Utilities */
+                .mb-4 { margin-bottom: 1rem; }
+                .mb-6 { margin-bottom: 1.5rem; }
+                .mt-4 { margin-top: 1rem; }
+                .mt-6 { margin-top: 1.5rem; }
+                .w-full { width: 100%; }
+                .flex-center { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
                 
                 .star-btn { 
                     font-size: 1.5rem; color: #cbd5e1; background: none; border: none; cursor: pointer; transition: color 0.1s; 
