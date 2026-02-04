@@ -29,7 +29,7 @@ export default async function handler(req) {
     }
 
     try {
-        const { messages } = await req.json();
+        const { messages, image, mimeType } = await req.json();
         const lastMessage = messages[messages.length - 1].content;
 
         // Build Context
@@ -53,12 +53,23 @@ export default async function handler(req) {
         context += "\n4. FORMATO LIMPIO: Usa listas cortas (bullets) en lugar de párrafos largos.";
         context += "\n5. Si el usuario saluda, saluda de vuelta corto y pregunta qué le interesa ver hoy.";
         context += "\n6. BÁSATE en la información de arriba, pero no intentes resumirla toda de golpe.";
+        context += "\n7. Si recibes una IMAGEN: Analízala detalladamente en busca de plagas, deficiencias o estado fenológico. Sé clínico y directo.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
-        const prompt = `${context}\n\nUsuario: ${lastMessage}\nAsesor:`;
 
-        const result = await model.generateContentStream(prompt);
+        const promptText = `${context}\n\nUsuario: ${lastMessage}\nAsesor:`;
+
+        // Multimodal Prompt Construction
+        let promptParts = [promptText];
+        if (image) {
+            promptParts = [
+                { inlineData: { mimeType: mimeType || 'image/jpeg', data: image } },
+                { text: promptText }
+            ];
+        }
+
+        const result = await model.generateContentStream(promptParts);
 
         const stream = new ReadableStream({
             async start(controller) {
