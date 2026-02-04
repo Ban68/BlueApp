@@ -13,7 +13,11 @@ const Dashboard = () => {
             </header>
 
             <div className="grid-cols-3">
-                <div className="card">
+                <div
+                    className="card"
+                    onClick={() => navigate('/market')}
+                    style={{ cursor: 'pointer', transition: 'transform 0.2s', borderLeft: '4px solid var(--primary)' }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                         <div style={{ background: '#dbeafe', padding: '0.5rem', borderRadius: '0.5rem', color: 'var(--primary)' }}>
                             <TrendingUp size={24} />
@@ -26,7 +30,11 @@ const Dashboard = () => {
                     <div className="badge" style={{ background: '#dcfce7', color: '#166534' }}>Datos 2026 Disp.</div>
                 </div>
 
-                <div className="card">
+                <div
+                    className="card"
+                    onClick={() => navigate('/technical')}
+                    style={{ cursor: 'pointer', transition: 'transform 0.2s', borderLeft: '4px solid var(--secondary)' }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                         <div style={{ background: '#dcfce7', padding: '0.5rem', borderRadius: '0.5rem', color: 'var(--secondary)' }}>
                             <Sprout size={24} />
@@ -39,7 +47,11 @@ const Dashboard = () => {
                     <div className="badge" style={{ background: '#fef3c7', color: '#92400e' }}>Actualizado</div>
                 </div>
 
-                <div className="card">
+                <div
+                    className="card"
+                    onClick={() => navigate('/business')}
+                    style={{ cursor: 'pointer', transition: 'transform 0.2s', borderLeft: '4px solid #dc2626' }}
+                >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                         <div style={{ background: '#fee2e2', padding: '0.5rem', borderRadius: '0.5rem', color: '#dc2626' }}>
                             <AlertTriangle size={24} />
