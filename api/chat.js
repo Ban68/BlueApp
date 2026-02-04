@@ -54,7 +54,7 @@ export default async function handler(req) {
         context += "\n5. IMÁGENES: Si recibes una foto, analízala primero visualmente (color, manchas, forma) antes de dar diagnóstico.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const promptText = `${context}\n\nUsuario: ${lastMessage}\nAsesor:`;
 
