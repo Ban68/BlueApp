@@ -4,7 +4,7 @@ import { MessageSquare, X, Send, Bot, User, Paperclip, Image as ImageIcon, Trash
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'assistant', content: '¡Hola! Soy tu experto en arándanos. Pregúntame sobre inversiones o sube una foto de tu cultivo.' }
+        { role: 'assistant', content: '¡Hola! ¿En qué te ayudo?' }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
