@@ -322,6 +322,10 @@ a {
     width: 100%;
   }
 
+  .layout {
+    flex-direction: column !important;
+  }
+
   .sidebar.hide-mobile {
     display: none !important;
   }
