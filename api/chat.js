@@ -56,7 +56,7 @@ export default async function handler(req) {
         context += "\n6. ANÁLISIS DE IMÁGENES: Si hay foto, describe primero lo que ves (síntomas visuales) y luego da tu diagnóstico técnico.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
         const promptText = `${context}\n\nUsuario: ${lastMessage}\nAsesor:`;
 
