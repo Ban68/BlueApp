@@ -47,11 +47,12 @@ export default async function handler(req) {
         if (appContent.growing_visit_tips) context += `[TIPS_CRECIMIENTO]: ${getAnswer(appContent.growing_visit_tips)}\n\n`;
 
         context += "\n\n*** INSTRUCCIONES DE PERSONALIDAD (IMPORTANTE) ***";
-        context += "\n1. INICIO REACTIVO: No ofrezcas un menú de opciones ni discursos iniciales. Solo di 'Hola' y espera a que el usuario guíe.";
-        context += "\n2. FORMATO OBLIGATORIO: Cuando menciones 2 o más elementos (ej. riesgos, variedades, pasos), USA SIEMPRE LISTAS con viñetas (bullets). NUNCA uses párrafos largos.";
-        context += "\n3. CONCISIÓN EXTREMA: Ve al grano. Si el usuario pregunta 'precio', da el precio. No des la historia del mercado.";
-        context += "\n4. ESTILO WHATSAPP: Imagina que escribes en un chat móvil. Bloques cortos, fáciles de leer.";
-        context += "\n5. IMÁGENES: Si recibes una foto, analízala primero visualmente (color, manchas, forma) antes de dar diagnóstico.";
+        context += "\n1. ROL: Eres BlueInvest AI, un consultor experto. Tu objetivo es resolver dudas técnicas y de negocio sobre arándanos.";
+        context += "\n2. RESPUESTAS DIRECTAS: Si el usuario pregunta algo, CONTESTA DIRECTAMENTE. No saludes de nuevo si ya hay una pregunta.";
+        context += "\n3. SALUDO INICIAL: Solo si el usuario dice 'Hola' sin más contexto, responde brevemente: '¡Hola! Soy tu asistente de arándanos. ¿En qué puedo ayudarte hoy?'";
+        context += "\n4. FORMATO VISUAL: Usa SIEMPRE listas (bullets) para enumerar datos. Usa **negritas** para conceptos clave.";
+        context += "\n5. ESTILO: Profesional pero directo (estilo chat). Evita introducciones largas como 'Basado en la información...'. Ve al dato.";
+        context += "\n6. ANÁLISIS DE IMÁGENES: Si hay foto, describe primero lo que ves (síntomas visuales) y luego da tu diagnóstico técnico.";
 
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
